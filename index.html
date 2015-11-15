@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Angular 2 - Firebase - Observable - Weather</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  </head>
+  <body>
+    <my-app>loading...</my-app>
+
+    <script src="https://code.angularjs.org/tools/system.js"></script>
+    <script src="https://code.angularjs.org/tools/typescript.js"></script>
+    <script src="https://code.angularjs.org/2.0.0-alpha.46/angular2.dev.js"></script>
+
+    <script src="https://cdn.firebase.com/js/client/2.3.1/firebase.js"></script>
+
+    <script>
+      System.config({
+        transpiler: 'typescript',
+        typescriptOptions: { emitDecoratorMetadata: true }
+      });
+      System.import('./app.ts').catch(console.error.bind(console));
+    </script>
+
+  </body>
+</html>
