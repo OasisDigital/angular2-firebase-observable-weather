@@ -4,7 +4,7 @@
 // This component displays a single entry from Firebase on the screen.
 // there is an unsolved problem, noted below.
 
-import {Component, CORE_DIRECTIVES, AsyncPipe, JsonPipe, Input, OnInit} from 'angular2/angular2';
+import {Component, CORE_DIRECTIVES, Observable, AsyncPipe, JsonPipe, Input, OnInit} from 'angular2/angular2';
 
 import {observableFirebaseObject, observableFirebaseArray} from './observableFirebase.ts';
 import {NgWhen} from './ngWhen.ts';
@@ -42,8 +42,9 @@ var template = `
 export class WeatherPanel implements OnInit {
   @Input()
   city: string;
-  currently: any;
-  minutely: any;
+
+  currently: Observable<any>;
+  hourly: Observable<any[]>;
 
   onInit() {
     //  This can't be called in the constructor because the properties
