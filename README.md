@@ -12,15 +12,22 @@ See the source code for various details, and various open questions.
 
 This is based on Angular 2, Alpha 46
 
-Demo at:
+Demo:
 
 http://oasisdigital.github.io/angular2-firebase-observable-weather/
 
-Source at:
+Source:
 
 https://github.com/OasisDigital/angular2-firebase-observable-weather
 
-Explanation video, coming soon.
+Explanation video:
+
+https://www.youtube.com/watch?v=Keth2msO9k8
+
+Blog post:
+
+http://blog.oasisdigital.com/2015/angular-firebase-observable-simple-weather-example/
+
 
 Kyle Cordes http://kylecordes.com
 
