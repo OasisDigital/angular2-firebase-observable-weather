@@ -9,13 +9,20 @@
 // "arrays", it understands the conventions use their to make an observable
 // that yields an array with each change.
 
+// TODO understand TypeScript generics more fully, seek advice from a guru.
+
 // TODO Further polish this, publish as a reusable library.
 
-import {Observable} from 'angular2/angular2';
+// TODO determine if the safe copies are compatible with performant Angular 2.
 
-export function observableFirebaseObject(ref: FirebaseQuery): Observable<any> {
+import { Observable } from 'angular2/angular2';
+
+// TODO How do I type this without adding another dependency on @reactivex/rxjs?
+// import { Subscriber } from '@reactivex/rxjs/dist/cjs/Rx';
+
+export function observableFirebaseObject<T>(ref: FirebaseQuery): Observable<T> {
   return Observable.create(function(observer: any) {
-    function value(snapshot: any) {
+    function value(snapshot: FirebaseDataSnapshot) {
       observer.next(snapshot.val());
     }
     ref.on('value', value);
@@ -25,65 +32,63 @@ export function observableFirebaseObject(ref: FirebaseQuery): Observable<any> {
   });
 }
 
-export function observableFirebaseArray(ref: FirebaseQuery): Observable<any[]> {
+export function observableFirebaseArray<T>(ref: FirebaseQuery): Observable<T[]> {
 
   return Observable.create(function(observer: any) {
-    var arr: any[] = [];
+    // Looking for how to type this well.
+    let arr: any[] = [];
     const keyFieldName = "$$fbKey";
 
-    function child_added(snapshot: any, prevChildKey: any) {
+    function child_added(snapshot: FirebaseDataSnapshot, prevChildKey: string) {
       let child = snapshot.val();
       child[keyFieldName] = snapshot.key();
-      arr = arr.slice();
       let prevEntry = arr.find((y) => y[keyFieldName] === prevChildKey);
       arr.splice(arr.indexOf(prevEntry) + 1, 0, child);
-      observer.next(arr);
+      observer.next(arr.slice()); // Safe copy
     }
 
-    function child_changed(snapshot: any) {
+    function child_changed(snapshot: FirebaseDataSnapshot) {
       let key = snapshot.key();
       let child = snapshot.val();
-      // TODO consider new array with new object in it
-      var x = arr.find((y) => y[keyFieldName] === key);
+      // TODO replace object rather than mutate it?
+      let x = arr.find((y) => y[keyFieldName] === key);
       if (x) {
         for (var k in child) x[k] = child[k];
       }
-      observer.next(arr);
+      observer.next(arr.slice()); // Safe copy
     }
 
-    function child_removed(snapshot: any) {
+    function child_removed(snapshot: FirebaseDataSnapshot) {
       let key = snapshot.key();
       let child = snapshot.val();
-      arr = arr.slice();
-      var x = arr.find((y) => y[keyFieldName] === key);
+      let x = arr.find((y) => y[keyFieldName] === key);
       if (x) {
         arr.splice(arr.indexOf(x), 1);
       }
-      observer.next(arr);
+      observer.next(arr.slice()); // Safe copy
     }
 
-    function child_moved(snapshot: any, prevChildKey: any) {
+    function child_moved(snapshot: FirebaseDataSnapshot, prevChildKey: string) {
       let key = snapshot.key();
       let child = snapshot.val();
       child[keyFieldName] = key;
-      arr = arr.slice();
       // Remove from old slot
-      var x = arr.find((y) => y[keyFieldName] === key);
+      let x = arr.find((y) => y[keyFieldName] === key);
       if (x) {
         arr.splice(arr.indexOf(x), 1);
       }
       // Add in new slot
-      var prevEntry = arr.find((y) => y[keyFieldName] === prevChildKey);
+      let prevEntry = arr.find((y) => y[keyFieldName] === prevChildKey);
       if (prevEntry) {
         arr.splice(arr.indexOf(prevEntry) + 1, 0, child);
       } else {
         arr.splice(0, 0, child);
       }
-      observer.next(arr);
+      observer.next(arr.slice()); // Safe copy
     }
 
-    // Start out empty until/unless data arrives from Firebase
-    observer.next(arr);
+    // Start out empty, until data arrives
+    observer.next(arr.slice()); // Safe copy
 
     ref.on('child_added', child_added);
     ref.on('child_changed', child_changed);
